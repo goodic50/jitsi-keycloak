@@ -2,7 +2,7 @@ version: '3'
 
 services:
   jitsi-keycloak:
-    image: d3473r/jitsi-keycloak
+    image: testkey
     container_name: jisi-keycloak
     restart: unless-stopped
     environment:

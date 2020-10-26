@@ -13,10 +13,19 @@ COPY server .
 RUN npm i --prod
 
 FROM alpine:3.8 as run
-RUN apk add --no-cache nodejs
+ARG USER=default
+ENV HOME /home/$USER
+RUN apk add --no-cache nodejs \
+    && apk add --update sudo \
+    && adduser -D $USER \
+    && echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER \
+    && chmod 0440 /etc/sudoers.d/$USER \
+    && mkdir /app \
+    && chown $USER /app
+USER $USER
 WORKDIR /app
 ENV NODE_ENV=production
 EXPOSE 3000
 CMD [ "node", "src/app.js" ]
-COPY --from=build-server /build .
-COPY --from=build-client /build/dist ./public
+COPY --chown=$USER --from=build-server /build .
+COPY --chown=$USER --from=build-client /build/dist ./public
